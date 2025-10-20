@@ -13,6 +13,7 @@ vars:
     - "clickhouse"
     - "clp"
     - "elasticsearch"
+    # Note: Presto-related images currently fail to build and are pending fixes.
     #- "presto_clp"
     #- "presto_parquet"
     - "sparksql"

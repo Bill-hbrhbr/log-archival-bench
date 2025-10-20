@@ -28,7 +28,7 @@ def get_config_dir() -> Path:
 
 def which(binary_name: str) -> str:
     """
-    Locate the full path of an executable.
+    Locates the full path of an executable.
 
     :param binary_name: Name of the binary to search for.
     :return: Full path to the executable as a string.
