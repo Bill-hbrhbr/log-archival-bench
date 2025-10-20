@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Builds a Docker image for the specified benchmark engine, and optionally dump the image
+Builds a Docker image for the specified benchmark engine, and optionally dumps the image
 configuration as JSON.
 """
 
@@ -17,7 +17,7 @@ from log_archival_bench.utils.path_utils import (
 
 def main(argv: list[str]) -> int:
     """
-    Builds a Docker image for the specified benchmark engine, and optionally dump the image
+    Builds a Docker image for the specified benchmark engine, and optionally dumps the image
     configuration as JSON.
 
     :param argv:

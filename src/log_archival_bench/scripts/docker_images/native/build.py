@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Builds a Docker image and optionally dump its configuration as JSON."""
+"""Builds a Docker image and optionally dumps its configuration as JSON."""
 
 import argparse
 import subprocess
@@ -14,7 +14,7 @@ from log_archival_bench.utils.path_utils import (
 
 def main(argv: list[str]) -> int:
     """
-    Builds a Docker image and optionally dump its configuration as JSON.
+    Builds a Docker image and optionally dumps its configuration as JSON.
 
     :param argv:
     :return: 0 on success, non-zero error code on failure.
