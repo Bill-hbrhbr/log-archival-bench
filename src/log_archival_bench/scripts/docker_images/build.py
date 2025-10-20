@@ -1,22 +1,24 @@
 #!/usr/bin/env python3
-"""Builds a Docker image and optionally dump its configuration as JSON."""
+"""
+Builds a Docker image for the specified benchmark engine, and optionally dump the image
+configuration as JSON.
+"""
 
 import argparse
 import subprocess
 import sys
-from pathlib import Path
 
 from log_archival_bench.scripts.docker_images.utils import get_image_name
 from log_archival_bench.utils.path_utils import (
     get_config_dir,
-    get_package_root,
     which,
 )
 
 
 def main(argv: list[str]) -> int:
     """
-    Builds a Docker image and optionally dump its configuration as JSON.
+    Builds a Docker image for the specified benchmark engine, and optionally dump the image
+    configuration as JSON.
 
     :param argv:
     :return: 0 on success, non-zero error code on failure.
@@ -31,38 +33,31 @@ def main(argv: list[str]) -> int:
 
     parsed_args = args_parser.parse_args(argv[1:])
     engine_name = parsed_args.engine_name
-    dump_config_path = parsed_args.dump_config_path
 
-    image_name = get_image_name(engine_name)
+    valid_engines = ["clickhouse", "clp", "elasticsearch", "sparksql", "zstandard"]
+    if engine_name not in valid_engines:
+        err_msg = f"Invalid engine name `{engine_name}`. Valid engines: {', '.join(valid_engines)}"
+        raise ValueError(err_msg)
 
     docker_file_path = get_config_dir() / "docker-images" / engine_name / "Dockerfile"
     if not docker_file_path.is_file():
         err_msg = f"Dockerfile for `{engine_name}` does not exist."
         raise RuntimeError(err_msg)
 
-    docker_bin = which("docker")
     # fmt: off
-    build_cmds = [
-      docker_bin,
-      "build",
-      "--tag", image_name,
-      str(get_package_root()),
-      "--file", str(docker_file_path),
+    build_cmd = [
+        which("python3"),
+        "-m", "log_archival_bench.scripts.docker_images.native.build",
+        "--image-name", get_image_name(engine_name),
+        "--docker-file-path", str(docker_file_path),
     ]
     # fmt: on
-    subprocess.run(build_cmds, check=True)
 
-    if dump_config_path is not None:
-        output_path = Path(dump_config_path)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        with output_path.open("w", encoding="utf-8") as f:
-            dump_cmds = [
-                docker_bin,
-                "inspect",
-                "--type=image",
-                image_name,
-            ]
-            subprocess.run(dump_cmds, check=True, stdout=f)
+    if parsed_args.dump_config_path is not None:
+        build_cmd.append("--dump-config-path")
+        build_cmd.append(parsed_args.dump_config_path)
+
+    subprocess.run(build_cmd, check=True)
 
     return 0
 
