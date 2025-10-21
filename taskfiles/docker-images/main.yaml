@@ -53,11 +53,12 @@ tasks:
     requires:
       vars: ["ENGINE_NAME"]
     sources:
-      - "{{.G_PROJECT_SRC_DIR}}/config/docker-images/{{.ENGINE_NAME}}/Dockerfile"
-      - "{{.G_PROJECT_SRC_DIR}}/scripts/docker_images/build.py"
-      - "{{.G_PROJECT_SRC_DIR}}/scripts/docker_images/utils.py"
-      - "{{.G_PROJECT_SRC_DIR}}/utils/**/*"
+      - "{{.G_PROJECT_SRC_DIR}}/**/*.py"
       - "{{.TASKFILE}}"
+      - exclude: "{{.G_PROJECT_SRC_DIR}}/build/**/*"
+      - exclude: "{{.G_PROJECT_SRC_DIR}}/config/**/*"
+      # This must come after the exclude
+      - "{{.G_PROJECT_SRC_DIR}}/config/docker-images/{{.ENGINE_NAME}}/Dockerfile"
     generates: ["{{.CHECKSUM_FILE}}"]
     deps:
       - task: "utils:checksum:validate"
