@@ -7,12 +7,10 @@ configuration as JSON.
 import argparse
 import subprocess
 import sys
+from pathlib import Path
 
 from log_archival_bench.scripts.docker_images.utils import get_image_name
-from log_archival_bench.utils.path_utils import (
-    get_config_dir,
-    which,
-)
+from log_archival_bench.utils.project_config import CONFIG_DIR
 
 
 def main(argv: list[str]) -> int:
@@ -39,14 +37,14 @@ def main(argv: list[str]) -> int:
         err_msg = f"Invalid engine name `{engine_name}`. Valid engines: {', '.join(valid_engines)}"
         raise ValueError(err_msg)
 
-    docker_file_path = get_config_dir() / "docker-images" / engine_name / "Dockerfile"
+    docker_file_path = Path(CONFIG_DIR) / "docker-images" / engine_name / "Dockerfile"
     if not docker_file_path.is_file():
         err_msg = f"Dockerfile for `{engine_name}` does not exist."
         raise RuntimeError(err_msg)
 
     # fmt: off
     build_cmd = [
-        which("python3"),
+        "python3",
         "-m", "log_archival_bench.scripts.docker_images.native.build",
         "--image-name", get_image_name(engine_name),
         "--docker-file-path", str(docker_file_path),

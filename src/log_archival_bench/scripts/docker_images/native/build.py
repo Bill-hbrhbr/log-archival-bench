@@ -6,10 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from log_archival_bench.utils.path_utils import (
-    get_package_root,
-    which,
-)
+from log_archival_bench.utils.project_config import PACKAGE_ROOT
 
 
 def main(argv: list[str]) -> int:
@@ -31,14 +28,13 @@ def main(argv: list[str]) -> int:
     docker_file_path = parsed_args.docker_file_path
     dump_config_path = parsed_args.dump_config_path
 
-    docker_bin = which("docker")
     # fmt: off
     build_cmds = [
-      docker_bin,
+      "docker",
       "build",
       "--tag", image_name,
-      str(get_package_root()),
       "--file", docker_file_path,
+      PACKAGE_ROOT,
     ]
     # fmt: on
     subprocess.run(build_cmds, check=True)
@@ -47,12 +43,7 @@ def main(argv: list[str]) -> int:
         output_path = Path(dump_config_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with output_path.open("w", encoding="utf-8") as f:
-            dump_cmds = [
-                docker_bin,
-                "inspect",
-                "--type=image",
-                image_name,
-            ]
+            dump_cmds = ["docker", "inspect", "--type=image", image_name]
             subprocess.run(dump_cmds, check=True, stdout=f)
 
     return 0

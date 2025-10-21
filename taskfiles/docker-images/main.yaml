@@ -56,6 +56,7 @@ tasks:
       - "{{.G_PROJECT_SRC_DIR}}/config/docker-images/{{.ENGINE_NAME}}/Dockerfile"
       - "{{.G_PROJECT_SRC_DIR}}/scripts/docker_images/build.py"
       - "{{.G_PROJECT_SRC_DIR}}/scripts/docker_images/utils.py"
+      - "{{.G_PROJECT_SRC_DIR}}/utils/**/*"
       - "{{.TASKFILE}}"
     generates: ["{{.CHECKSUM_FILE}}"]
     deps:
