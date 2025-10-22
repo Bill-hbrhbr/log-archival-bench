@@ -9,8 +9,27 @@ import subprocess
 import sys
 from pathlib import Path
 
-from log_archival_bench.scripts.docker_images.utils import build_docker_image, get_image_name
-from log_archival_bench.utils.project_config import CONFIG_DIR
+from log_archival_bench.scripts.docker_images.utils import get_image_name
+from log_archival_bench.utils.project_config import CONFIG_DIR, PACKAGE_ROOT
+
+
+def build_docker_image(image_name: str, docker_file_path_str: str) -> None:
+    """
+    Builds a docker image.
+
+    :param image_name:
+    :param docker_file_path_str:
+    """
+    # fmt: off
+    build_cmds = [
+      "docker",
+      "build",
+      "--tag", image_name,
+      "--file", docker_file_path_str,
+      str(PACKAGE_ROOT),
+    ]
+    # fmt: on
+    subprocess.run(build_cmds, check=True)
 
 
 def main(argv: list[str]) -> int:
