@@ -13,25 +13,6 @@ from log_archival_bench.scripts.docker_images.utils import get_image_name
 from log_archival_bench.utils.project_config import CONFIG_DIR, PACKAGE_ROOT
 
 
-def build_docker_image(image_name: str, docker_file_path_str: str) -> None:
-    """
-    Builds a docker image.
-
-    :param image_name:
-    :param docker_file_path_str:
-    """
-    # fmt: off
-    build_cmds = [
-      "docker",
-      "build",
-      "--tag", image_name,
-      "--file", docker_file_path_str,
-      str(PACKAGE_ROOT),
-    ]
-    # fmt: on
-    subprocess.run(build_cmds, check=True)
-
-
 def main(argv: list[str]) -> int:
     """
     Builds a Docker image for the specified benchmark engine, and optionally dumps the image
@@ -42,35 +23,41 @@ def main(argv: list[str]) -> int:
     """
     args_parser = argparse.ArgumentParser()
     args_parser.add_argument(
-        "--engine-name", required=True, help="The engine to be installed inside the Docker image."
+        "--engine-name", required=True, help="The engine to be benchmarked inside the Docker image."
     )
     args_parser.add_argument(
-        "--dump-config-path", help="Path to the file to dump the Docker image JSON metadata."
+        "--metadata-file", metavar="FILE", help="Path to write build result metadata."
     )
 
     parsed_args = args_parser.parse_args(argv[1:])
     engine_name = parsed_args.engine_name
-    dump_config_path = parsed_args.dump_config_path
+    metadata_file = parsed_args.metadata_file
 
     valid_engines = ["clickhouse", "clp", "elasticsearch", "sparksql", "zstandard"]
     if engine_name not in valid_engines:
         err_msg = f"Invalid engine name `{engine_name}`. Valid engines: {', '.join(valid_engines)}"
         raise ValueError(err_msg)
 
-    docker_file_path = Path(CONFIG_DIR) / "docker-images" / engine_name / "Dockerfile"
+    docker_file_path = Path(CONFIG_DIR) / "docker-images" / f"{engine_name}.Dockerfile"
     if not docker_file_path.is_file():
         err_msg = f"Dockerfile for `{engine_name}` does not exist."
         raise RuntimeError(err_msg)
 
-    image_name = get_image_name(engine_name)
-    build_docker_image(image_name, str(docker_file_path))
+    # fmt: off
+    build_cmds = [
+      "docker", "buildx", "build",
+      "--load",
+      "--tag", get_image_name(engine_name),
+      "--file", str(docker_file_path),
+    ]
+    # fmt: on
+    if metadata_file is not None:
+        Path(metadata_file).parent.mkdir(parents=True, exist_ok=True)
+        build_cmds.append("--metadata-file")
+        build_cmds.append(metadata_file)
+    build_cmds.append(str(PACKAGE_ROOT))
 
-    if dump_config_path is not None:
-        output_path = Path(dump_config_path)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        with output_path.open("w", encoding="utf-8") as f:
-            dump_cmds = ["docker", "inspect", "--type=image", image_name]
-            subprocess.run(dump_cmds, check=True, stdout=f)
+    subprocess.run(build_cmds, check=True)
 
     return 0
 
