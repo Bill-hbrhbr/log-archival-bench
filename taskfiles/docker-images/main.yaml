@@ -54,7 +54,8 @@ tasks:
       INSPECT_CMD: |-
         uv run "{{.G_DOCKER_IMAGE_SCRIPT_DIR}}/inspect.py" \
           --engine-name {{.ENGINE_NAME}} \
-          --metadata-file "{{.OUTPUT_DIR}}/docker_inspect.json"
+          --metadata-file "{{.OUTPUT_DIR}}/docker_inspect.json" \
+          --trim
     requires:
       vars: ["ENGINE_NAME"]
     sources:
