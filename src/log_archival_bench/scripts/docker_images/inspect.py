@@ -8,7 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from log_archival_bench.scripts.docker_images.utils import get_image_name
+from log_archival_bench.scripts.docker_images.utils import get_image_name, validate_engine_name
 
 
 def main(argv: list[str]) -> int:
@@ -44,11 +44,13 @@ def main(argv: list[str]) -> int:
     metadata_file = parsed_args.metadata_file
     trim = parsed_args.trim
 
+    validate_engine_name(engine_name)
+
     dump_cmds = ["docker", "inspect", "--type=image", get_image_name(engine_name)]
     proc = subprocess.run(dump_cmds, capture_output=True, text=True, check=True)
     inspect_json = json.loads(proc.stdout)
     if trim:
-        with contextlib.suppress(BaseException):
+        with contextlib.suppress(IndexError, KeyError, TypeError):
             inspect_json[0]["Metadata"].pop("LastTagTime")
 
     metadata_file_path = Path(metadata_file)
