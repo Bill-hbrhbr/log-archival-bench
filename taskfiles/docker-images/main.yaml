@@ -59,8 +59,10 @@ tasks:
     requires:
       vars: ["ENGINE_NAME"]
     sources:
-      - "{{.G_PROJECT_SRC_DIR}}/**/*.py"
-      - "{{.TASKFILE}}"
+      - "{{.G_PROJECT_SRC_DIR}}/**/*"
+      - "{{.ROOT_DIR}}/Taskfile.yaml"
+      - "{{.ROOT_DIR}}/taskfiles/**/*.yaml"
+      - "{{.ROOT_DIR}}/tools/yscope-dev-utils/exports/taskfiles/**/*.yaml"
       - exclude: "{{.G_PROJECT_SRC_DIR}}/build/**/*"
       - exclude: "{{.G_PROJECT_SRC_DIR}}/config/**/*"
       # This must come after the exclude
