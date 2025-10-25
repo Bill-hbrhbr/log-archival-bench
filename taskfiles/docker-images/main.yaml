@@ -49,12 +49,12 @@ tasks:
     label: "{{.TASK}}:{{.ENGINE_NAME}}"
     vars:
       CHECKSUM_FILE: "{{.G_DOCKER_IMAGE_CHECKSUMS_DIR}}/{{.ENGINE_NAME}}.md5"
-      OUTPUT_DIR: "{{.G_DOCKER_IMAGE_CHECKSUMS_DIR}}/{{.ENGINE_NAME}}"
+      METADATA_FILE: "{{.G_DOCKER_IMAGE_CHECKSUMS_DIR}}/{{.ENGINE_NAME}}.json"
 
       INSPECT_CMD: |-
         uv run "{{.G_DOCKER_IMAGE_SCRIPT_DIR}}/inspect.py" \
           --engine-name {{.ENGINE_NAME}} \
-          --metadata-file "{{.OUTPUT_DIR}}/docker_inspect.json" \
+          --metadata-file "{{.METADATA_FILE}}" \
           --trim
     requires:
       vars: ["ENGINE_NAME"]
@@ -64,14 +64,14 @@ tasks:
       - exclude: "{{.G_PROJECT_SRC_DIR}}/build/**/*"
       - exclude: "{{.G_PROJECT_SRC_DIR}}/config/**/*"
       # This must come after the exclude
-      - "{{.G_PROJECT_SRC_DIR}}/config/docker-images/{{.ENGINE_NAME}}/Dockerfile"
+      - "{{.G_PROJECT_SRC_DIR}}/config/docker-images/{{.ENGINE_NAME}}.Dockerfile"
     generates: ["{{.CHECKSUM_FILE}}"]
     deps:
       - task: "validate-single-image-checksum"
         vars:
           CHECKSUM_FILE: "{{.CHECKSUM_FILE}}"
           INSPECT_CMD: "{{.INSPECT_CMD}}"
-          OUTPUT_DIR: "{{.OUTPUT_DIR}}"
+          METADATA_FILE: "{{.METADATA_FILE}}"
     cmds:
       - "uv run '{{.G_DOCKER_IMAGE_SCRIPT_DIR}}/build.py' --engine-name {{.ENGINE_NAME}}"
 
@@ -80,28 +80,28 @@ tasks:
         vars:
           CHECKSUM_FILE: "{{.CHECKSUM_FILE}}"
           INSPECT_CMD: "{{.INSPECT_CMD}}"
-          OUTPUT_DIR: "{{.OUTPUT_DIR}}"
+          METADATA_FILE: "{{.METADATA_FILE}}"
 
   validate-single-image-checksum:
     internal: true
     requires:
-      vars: ["CHECKSUM_FILE", "INSPECT_CMD", "OUTPUT_DIR"]
+      vars: ["CHECKSUM_FILE", "INSPECT_CMD", "METADATA_FILE"]
     cmds:
       # Dumps metadata of the current image. May fail if the image does not exist.
-      - "{{.INSPECT_CMD}} && true"
+      - "{{.INSPECT_CMD}} || true"
       - task: "utils:checksum:validate"
         vars:
           CHECKSUM_FILE: "{{.CHECKSUM_FILE}}"
-          INCLUDE_PATTERNS: ["{{.OUTPUT_DIR}}"]
+          INCLUDE_PATTERNS: ["{{.METADATA_FILE}}"]
 
   compute-single-image-checksum:
     internal: true
     requires:
-      vars: ["CHECKSUM_FILE", "INSPECT_CMD", "OUTPUT_DIR"]
+      vars: ["CHECKSUM_FILE", "INSPECT_CMD", "METADATA_FILE"]
     cmds:
       # Dumps metadata of the newly created image. This command should not fail.
       - "{{.INSPECT_CMD}}"
       - task: "utils:checksum:compute"
         vars:
           CHECKSUM_FILE: "{{.CHECKSUM_FILE}}"
-          INCLUDE_PATTERNS: ["{{.OUTPUT_DIR}}"]
+          INCLUDE_PATTERNS: ["{{.METADATA_FILE}}"]
