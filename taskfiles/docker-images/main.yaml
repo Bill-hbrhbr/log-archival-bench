@@ -64,7 +64,7 @@ tasks:
         uv run "{{.G_DOCKER_IMAGE_SCRIPT_DIR}}/inspect.py" \
           --engine-name {{.ENGINE_NAME}} \
           --metadata-file "{{.METADATA_FILE}}" \
-          --trim
+          --id-only
     requires:
       vars: ["ENGINE_NAME"]
     sources:
