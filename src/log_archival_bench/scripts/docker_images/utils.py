@@ -3,22 +3,24 @@
 import os
 
 
-def get_image_name(engine_name: str) -> str:
+def get_image_name(service_name: str) -> str:
     """
-    :param engine_name: The name of the service engine inside the Docker image.
-    :return: The name assigned to the Docker image that contains the engine.
+    :param service_name:
+    :return: The name assigned to the Docker image that contains the service.
     """
     user = os.getenv("USER", "clp-user")
-    return f"log-archival-bench-{engine_name}-ubuntu-jammy:dev-{user}"
+    return f"log-archival-bench-{service_name}-ubuntu-jammy:dev-{user}"
 
 
-def validate_engine_name(engine_name: str) -> None:
+def validate_service_name(service_name: str) -> None:
     """
-    :param engine_name: The name of the service engine to be validated.
-    :return: Whether this is a valid service engine that exists in the benchmark list.
+    :param service_name: The name of the benchmark service.
+    :return: Whether this is a valid service.
     """
-    # NOTE: Keep in sync with `G_DOCKER_IMAGE_ENGINES` in taskfiles/docker-images/main.yaml
-    valid_engines = ["clickhouse", "clp", "elasticsearch", "sparksql", "zstandard"]
-    if engine_name not in valid_engines:
-        err_msg = f"Invalid engine name `{engine_name}`. Valid engines: {', '.join(valid_engines)}"
+    # NOTE: Keep in sync with `G_DOCKER_IMAGE_SERVICES` in taskfiles/docker-images/main.yaml
+    valid_services = ["clickhouse", "clp", "elasticsearch", "sparksql", "zstandard"]
+    if service_name not in valid_services:
+        err_msg = (
+            f"Invalid service name `{service_name}`. Valid services: {', '.join(valid_services)}"
+        )
         raise ValueError(err_msg)
