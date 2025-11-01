@@ -26,15 +26,16 @@ To build all Docker images concurrently:
 task docker-images:build
 ```
 
-### Build a Single Docker Images
+### Build a Single Docker Image
 
-To build a specific image for a given engine:
+To build a specific image for a given service engine:
 
 ```shell
-uv run src/log_archival_bench/scripts/docker_images/build.py --engine-name <engine_name>
+uv run src/log_archival_bench/scripts/docker_images/build.py --service-name <service_name>
 ```
 
-Each image corresponds to a specific engine (e.g. `clp`, `clickhouse`, `elasticsearch`, `sparksql`).
+Each valid service (e.g. `presto`, `clickhouse`, `elasticsearch`) has its own dedicated Docker
+image, built by the `log-archival-bench` repository, for use in benchmark testing.
 
 ## Run Everything
 
@@ -42,7 +43,7 @@ Follow the instructions above to set up your virtual environment.
 
 Stay in the [Log Archival Bench](/) directory and run [scripts/benchall.py](/scripts/benchall.py). This script runs the tools \+ parameters in its "benchmarks" variable across all datasets under [data/](/data).
 
-## Run One Engine
+## Run One Benchmark Engine
 
 Execute `./assets/{engine_name}/main.py {path to <dataset_name>.log}` to run ingestion and search on that dataset.
 
