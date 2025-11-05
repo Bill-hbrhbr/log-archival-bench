@@ -13,29 +13,25 @@ You can download all the datasets we use in the benchmark using the [download\_a
 
 The [download\_all.py](/scripts/download_all.py) script will download all datasets into the correct directories **with** the specified names, concentrate multi-file datasets together into a single file, and generate any modified version of the dataset needed for tools like Presto \+ CLP.
 
-## Docker Environments
+## Docker Containers
 
-Benchmarks are executed inside Docker containers to ensure reproducible, isolated test environments
-with controlled resource limits.
+Benchmark services run inside Docker containers to provide reproducible, isolated environments for
+test service engines with straightforward setup and teardown.
 
-### Build All Docker Images
+While we use existing published images whenever possible, the `log-archival-bench` repository also
+builds and maintains its own service-specific images for benchmark testing.
 
-To build all Docker images concurrently:
+To build all benchmark service Docker images in parallel:
 
 ```shell
 task docker-images:build
 ```
 
-### Build a Single Docker Image
-
-To build a specific image for a given service engine:
+To build an image for a specific service:
 
 ```shell
 uv run src/log_archival_bench/scripts/docker_images/build.py --service-name <service_name>
 ```
-
-Each valid service (e.g. `presto`, `clickhouse`, `elasticsearch`) has its own dedicated Docker
-image, built by the `log-archival-bench` repository, for use in benchmark testing.
 
 ## Run Everything
 
@@ -43,9 +39,9 @@ Follow the instructions above to set up your virtual environment.
 
 Stay in the [Log Archival Bench](/) directory and run [scripts/benchall.py](/scripts/benchall.py). This script runs the tools \+ parameters in its "benchmarks" variable across all datasets under [data/](/data).
 
-## Run One Benchmark Engine
+## Run One Tool
 
-Execute `./assets/{engine_name}/main.py {path to <dataset_name>.log}` to run ingestion and search on that dataset.
+Execute `./assets/{tool name}/main.py {path to <dataset name>.log}` to run ingestion and search on that dataset.
 
 ## Contributing
 
