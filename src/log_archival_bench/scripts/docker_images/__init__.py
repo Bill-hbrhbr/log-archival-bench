@@ -1,1 +1,1 @@
-"""Scripts for docker-container-related tasks."""
+"""Scripts related to Docker images and containers."""
