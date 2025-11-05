@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Builds a Docker image for the specified service."""
+"""Builds a Docker image for the specified benchmark service."""
 
 import argparse
 import subprocess
@@ -12,7 +12,7 @@ from log_archival_bench.utils.project_config import CONFIG_DIR, PACKAGE_ROOT
 
 def main(argv: list[str]) -> int:
     """
-    Builds a Docker image for the specified service.
+    Builds a Docker image for the specified benchmark service.
 
     :param argv:
     :return: 0 on success, non-zero error code on failure.
@@ -21,7 +21,7 @@ def main(argv: list[str]) -> int:
     args_parser.add_argument(
         "--service-name",
         required=True,
-        help="The service that the built Docker image will provide.",
+        help="The benchmark service that the built Docker image will provide.",
     )
 
     parsed_args = args_parser.parse_args(argv[1:])

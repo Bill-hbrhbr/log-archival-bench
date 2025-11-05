@@ -6,11 +6,11 @@ includes:
     taskfile: "../../tools/yscope-dev-utils/exports/taskfiles/utils/utils.yaml"
 
 vars:
-  G_DOCKER_IMAGE_SERVICES:
+  G_BENCHMARK_DOCKER_SERVICES:
     - "clickhouse"
     - "clp"
     - "elasticsearch"
-    # Note: Presto-related images currently fail to build and are pending fixes.
+    # Note: Presto-related service images currently fail to build and are pending fixes.
     #- "presto_clp"
     #- "presto_parquet"
     - "sparksql"
@@ -19,15 +19,19 @@ vars:
 
 tasks:
   build:
+    # Build Docker images for all containerized benchmark services in parallel.
     run: "once"
     deps:
       - for:
-          var: "G_DOCKER_IMAGE_SERVICES"
-        task: "build-single-image"
+          var: "G_BENCHMARK_DOCKER_SERVICES"
+        task: "build-single-benchmark-service-image"
         vars:
           SERVICE_NAME: "{{.ITEM}}"
 
-  build-single-image:
+  build-single-benchmark-service-image:
+    # Builds a Docker image for the specified benchmark service. Runs only once per unique service.
+    #
+    # @param {string} SERVICE_NAME The benchmark service that the built Docker image will provide.
     internal: true
     label: "{{.TASK}}:{{.SERVICE_NAME}}"
     requires:
