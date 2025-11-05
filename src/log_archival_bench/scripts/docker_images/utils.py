@@ -15,7 +15,7 @@ def get_image_name(service_name: str) -> str:
 def validate_service_name(service_name: str) -> None:
     """
     :param service_name: The name of the benchmark service.
-    :return: Whether this is a valid service.
+    :raise: ValueError if the service is invalid.
     """
     # NOTE: Keep in sync with `G_DOCKER_IMAGE_SERVICES` in taskfiles/docker-images/main.yaml
     valid_services = ["clickhouse", "clp", "elasticsearch", "sparksql", "zstandard"]
